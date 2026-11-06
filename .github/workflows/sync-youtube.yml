@@ -1,0 +1,114 @@
+name: Sync YouTube uploads
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/sync-youtube.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: knowgura-youtube-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out website
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Read latest public uploads from YouTube
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          import urllib.request
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
+
+          handle_url = "https://www.youtube.com/@KnowguraTV"
+          request = urllib.request.Request(
+              handle_url,
+              headers={"User-Agent": "Mozilla/5.0 (compatible; KnowguraSite/1.0)"}
+          )
+          with urllib.request.urlopen(request, timeout=30) as response:
+              page = response.read().decode("utf-8", "replace")
+
+          channel_id = None
+          patterns = [
+              r'"externalId"\s*:\s*"(UC[A-Za-z0-9_-]{22})"',
+              r'"channelId"\s*:\s*"(UC[A-Za-z0-9_-]{22})"',
+              r'itemprop=["\']channelId["\']\s+content=["\'](UC[A-Za-z0-9_-]{22})["\']'
+          ]
+          for pattern in patterns:
+              match = re.search(pattern, page)
+              if match:
+                  channel_id = match.group(1)
+                  break
+
+          if not channel_id:
+              raise RuntimeError("Could not identify the public channel ID from @KnowguraTV. Check that the handle is correct.")
+
+          feed_url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channel_id
+          feed_request = urllib.request.Request(
+              feed_url,
+              headers={"User-Agent": "Mozilla/5.0 (compatible; KnowguraSite/1.0)"}
+          )
+          with urllib.request.urlopen(feed_request, timeout=30) as response:
+              xml_data = response.read()
+
+          root = ET.fromstring(xml_data)
+          atom = "{http://www.w3.org/2005/Atom}"
+          yt = "{http://www.youtube.com/xml/schemas/2015}"
+          media = "{http://search.yahoo.com/mrss/}"
+
+          videos = []
+          for entry in root.findall(atom + "entry"):
+              video_id = entry.findtext(yt + "videoId")
+              title = entry.findtext(atom + "title")
+              if not video_id or not title:
+                  continue
+              published = (entry.findtext(atom + "published") or "")[:10]
+              group = entry.find(media + "group")
+              description = group.findtext(media + "description") if group is not None else ""
+              videos.append({
+                  "id": video_id,
+                  "title": title,
+                  "description": description or "A Knowgura documentary",
+                  "published": published,
+                  "category": "Latest upload · Knowgura"
+              })
+
+          if not videos:
+              raise RuntimeError("The YouTube feed returned no public uploads; leaving the current catalogue untouched.")
+
+          Path("videos.json").write_text(
+              json.dumps(videos[:15], ensure_ascii=False, indent=2) + "\\n",
+              encoding="utf-8"
+          )
+          print(f"Prepared {min(len(videos), 15)} Knowgura videos from channel {channel_id}.")
+          PY
+
+      - name: Commit catalogue when it changes
+        run: |
+          if git diff --quiet -- videos.json; then
+            echo "The video catalogue is already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add videos.json
+          git commit -m "Sync latest Knowgura YouTube uploads"
+          git push

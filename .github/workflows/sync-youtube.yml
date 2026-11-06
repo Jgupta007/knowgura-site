@@ -62,7 +62,7 @@ jobs:
               raise RuntimeError("Could not identify the public channel ID from @KnowguraTV. Check that the handle is correct.")
 
           print("Detected public channel ID:", channel_id)
-          feed_url = "https://www.youtube.com/feeds/videos.xml?channel_id=" + channel_id
+          feed_url = "https://www.youtube.com/xml/feeds/videos.xml?channel_id=" + channel_id
           feed_request = urllib.request.Request(
               feed_url,
               headers={"User-Agent": "Mozilla/5.0 (compatible; KnowguraSite/1.0)"}

@@ -70,13 +70,17 @@ jobs:
           with urllib.request.urlopen(feed_request, timeout=30) as response:
               xml_data = response.read()
 
+          print("Feed response preview:", xml_data[:1600].decode("utf-8", "replace"))
           root = ET.fromstring(xml_data)
+          print("Feed root:", root.tag, "children:", [child.tag for child in list(root)[:20]])
           atom = "{http://www.w3.org/2005/Atom}"
           yt = "{http://www.youtube.com/xml/schemas/2015}"
           media = "{http://search.yahoo.com/mrss/}"
 
           videos = []
-          for entry in root.findall(atom + "entry"):
+          entries = root.findall(atom + "entry")
+          print("Atom entries found:", len(entries))
+          for entry in entries:
               video_id = entry.findtext(yt + "videoId")
               title = entry.findtext(atom + "title")
               if not video_id or not title:

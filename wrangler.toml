@@ -1,0 +1,7 @@
+name = "knowgura-youtube-feed"
+main = "worker.js"
+compatibility_date = "2026-11-06"
+
+[vars]
+# Replace with the exact 24-character channel ID beginning with UC.
+YOUTUBE_CHANNEL_ID = "REPLACE_WITH_YOUR_UC_CHANNEL_ID"

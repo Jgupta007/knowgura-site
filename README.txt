@@ -1,31 +1,24 @@
 KNOWGURA WEBSITE
 ================
 
-Static site:
+Main website:
 - index.html
 - assets/videos.js
+- videos.json
 
-Automatic YouTube channel feed proxy:
-- worker.js
-- wrangler.toml
+AUTOMATIC YOUTUBE UPLOADS
+- GitHub Actions workflow: .github/workflows/sync-youtube.yml
+- The workflow detects the channel ID from the public @KnowguraTV page,
+  reads YouTube's public Atom feed, and refreshes videos.json.
+- It runs every 15 minutes and can also be started manually in GitHub:
+  Repository > Actions > Sync YouTube uploads > Run workflow.
+- No YouTube login, API key, or paid subscription is required.
+- Only public videos are listed; YouTube feed updates may take a short time.
 
-CLOUDFLARE PAGES
+CLOUDFLARE PAGES DEPLOYMENT
 - Connect this repository to Cloudflare Pages.
 - Framework preset: None
 - Build command: leave blank (or use exit 0)
 - Build output directory: /
 - Production branch: main
-
-AUTOMATIC YOUTUBE UPLOADS
-1. Find the exact channel ID in YouTube Studio > Settings > Channel > Advanced settings.
-   It starts with UC and is 24 characters long.
-2. Deploy worker.js as a Cloudflare Worker named knowgura-youtube-feed.
-   wrangler.toml is included for deployment with Wrangler.
-3. Set Worker variable YOUTUBE_CHANNEL_ID to the channel ID.
-4. The Worker feed endpoint will be https://<worker-subdomain>.workers.dev/feed.xml
-5. Add that exact URL to window.KNOWGURA_FEED_URL in index.html.
-6. New public uploads are read from YouTube's public Atom channel feed.
-   Feed updates can take a short time; they are not instantaneous.
-
-Until the Worker is configured, the homepage uses a fallback set of the two
-existing Knowgura documentaries. No YouTube login credentials are needed.
+- Enable automatic deployments from commits to main.

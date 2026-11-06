@@ -95,7 +95,7 @@ jobs:
               raise RuntimeError("The YouTube feed returned no public uploads; leaving the current catalogue untouched.")
 
           Path("videos.json").write_text(
-              json.dumps(videos[:15], ensure_ascii=False, indent=2) + "\\n",
+              json.dumps(videos[:15], ensure_ascii=False, indent=2) + "\n",
               encoding="utf-8"
           )
           print(f"Prepared {min(len(videos), 15)} Knowgura videos from channel {channel_id}.")

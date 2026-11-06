@@ -7,13 +7,15 @@ Main website:
 - videos.json
 
 AUTOMATIC YOUTUBE UPLOADS
-- GitHub Actions workflow: .github/workflows/sync-youtube.yml
-- The workflow detects the channel ID from the public @KnowguraTV page,
-  reads YouTube's public Atom feed, and refreshes videos.json.
-- It runs every 15 minutes and can also be started manually in GitHub:
-  Repository > Actions > Sync YouTube uploads > Run workflow.
-- No YouTube login, API key, or paid subscription is required.
-- Only public videos are listed; YouTube feed updates may take a short time.
+The website is prepared to read a generated videos.json catalogue and display
+the latest videos automatically. The scheduled GitHub Actions sync will be
+enabled after the exact channel ID is verified. The public @KnowguraTV page
+currently resolves to an empty feed ID, so the site must not sync from that
+unverified value.
+
+To provide the ID:
+YouTube Studio > Settings > Channel > Advanced settings > Channel ID.
+It is a public identifier beginning with UC; do not send passwords or tokens.
 
 CLOUDFLARE PAGES DEPLOYMENT
 - Connect this repository to Cloudflare Pages.
@@ -21,4 +23,3 @@ CLOUDFLARE PAGES DEPLOYMENT
 - Build command: leave blank (or use exit 0)
 - Build output directory: /
 - Production branch: main
-- Enable automatic deployments from commits to main.

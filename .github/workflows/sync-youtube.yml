@@ -52,16 +52,16 @@ jobs:
               if kind == "video":
                   marker = page.find('"videoDetails"')
                   region = page[marker:marker + 6000] if marker >= 0 else page
-                  match = re.search(r'"channelId"\\s*:\\s*"(UC[A-Za-z0-9_-]{22})"', region)
+                  match = re.search(r'"channelId"\s*:\s*"(UC[A-Za-z0-9_-]{22})"', region)
                   if match:
                       return match.group(1)
               else:
                   marker = page.find('"channelMetadataRenderer"')
                   region = page[marker:marker + 8000] if marker >= 0 else page
                   for pattern in (
-                      r'"externalId"\\s*:\\s*"(UC[A-Za-z0-9_-]{22})"',
-                      r'"channelId"\\s*:\\s*"(UC[A-Za-z0-9_-]{22})"',
-                      r'itemprop=["\\']channelId["\\']\\s+content=["\\'](UC[A-Za-z0-9_-]{22})["\\']'
+                      r'"externalId"\s*:\s*"(UC[A-Za-z0-9_-]{22})"',
+                      r'"channelId"\s*:\s*"(UC[A-Za-z0-9_-]{22})"',
+                      r'itemprop=["\']channelId["\']\s+content=["\'](UC[A-Za-z0-9_-]{22})["\']'
                   ):
                       match = re.search(pattern, region)
                       if match:

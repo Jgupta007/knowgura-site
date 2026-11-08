@@ -14,8 +14,8 @@
  const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const classify=v=>{const s=(v.title+' '+(v.description||'')).toLowerCase();
   if(/trump|president|prime minister|politic|government|kim jong|netanyahu|modi|leader|election|war|india protects|america protects|white house|power/.test(s))return 'Power & Politics';
-  if(/crime|heist|hack|fraud|scam|murder|killer|poison|cult|robbery|theft|bank|cooper|investigation|criminal|binance/.test(s))return 'Crime';
-  if(/tech|technology|quantum|ai\b|artificial intelligence|internet|data|cyber|crypto|bitcoin|money|billion|company|business|econom|theranos|finance|startup|software/.test(s))return 'Tech & Money';
+  if(/crime|heist|hack|fraud|scam|murder|killer|poison|cult|robbery|theft|bank|cooper|investigation|criminal/.test(s))return 'Crime';
+  if(/tech|technology|quantum|ai\b|artificial intelligence|internet|data|cyber|crypto|bitcoin|binance|money|billion|company|business|econom|theranos|finance|startup|software/.test(s))return 'Tech & Money';
   if(/mystery|mysterious|unexplained|secret|unknown|unsolved|disappear|god|ancient|paranormal|strange/.test(s))return 'Mysteries';
   return 'Mysteries';
  };

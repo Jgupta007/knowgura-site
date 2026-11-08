@@ -46,7 +46,15 @@
   const groups=[['politicsGrid','Power & Politics'],['crimeGrid','Crime'],['techGrid','Tech & Money'],['mysteryGrid','Mysteries']];
   groups.forEach(([id,cat])=>{const el=document.getElementById(id);const rows=videos.filter(v=>classify(v)===cat);el.innerHTML=rows.length?rows.map(card).join(''):'<p class="category-empty">More stories coming soon.</p>'});
   document.querySelectorAll('.card [data-video]').forEach(el=>el.addEventListener('click',()=>window.openKnowguraVideo(el.dataset.video)));
-  const search=document.getElementById('search');search?.addEventListener('input',()=>{const q=search.value.toLowerCase();document.querySelectorAll('.card').forEach(el=>{el.style.display=(el.dataset.search||'').includes(q)?'':'none'})});
+  const search=document.getElementById('search');
+  const searchButton=document.getElementById('searchButton');
+  const applySearch=()=>{const q=(search?.value||'').trim().toLowerCase();let count=0;
+   document.querySelectorAll('.category-row').forEach(section=>{let visible=0;section.querySelectorAll('.card').forEach(el=>{const match=!q||(el.dataset.search||'').includes(q);el.style.display=match?'':'none';if(match){visible++;count++}});section.style.display=(!q||visible>0)?'':'none'});
+   if(q&&count===0){let note=document.getElementById('searchEmpty');if(!note){note=document.createElement('p');note.id='searchEmpty';note.className='empty';note.style.cssText='padding:0 5%;color:#bbb';document.querySelector('main').insertBefore(note,document.querySelector('.category-row'))}note.textContent='No documentaries found for “'+(search.value.trim())+'”. Try another keyword.'}else{document.getElementById('searchEmpty')?.remove()}
+  };
+  search?.addEventListener('input',applySearch);
+  search?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applySearch();const first=document.querySelector('.category-row:not([style*="display: none"]) .card:not([style*="display: none"])');first?.scrollIntoView({behavior:'smooth',block:'center'})}});
+  searchButton?.addEventListener('click',()=>{search?.focus();applySearch()});
  }
  document.addEventListener('DOMContentLoaded',load);
 })();

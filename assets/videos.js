@@ -21,7 +21,8 @@
   return 'Mysteries';
  };
  const tags=v=>{const category=classify(v);const s=(v.title+' '+(v.description||'')).toLowerCase();let sub='DOCUMENTARY';
-  if(/trump|president|prime minister|politic|government|kim jong|netanyahu|modi|leader|election|white house/.test(s))sub='WORLD LEADERS';
+  if(/cooper|quantum physics|explain(?:s)? god|god/.test(s))sub='UNSOLVED MYSTERY';
+  else if(/trump|president|prime minister|politic|government|kim jong|netanyahu|modi|leader|election|white house/.test(s))sub='WORLD LEADERS';
   else if(/heist|bank|robbery|theft/.test(s))sub='HEIST';
   else if(/fraud|scam|theranos/.test(s))sub='FRAUD';
   else if(/hack|cyber|binance|crypto|bitcoin/.test(s))sub='CYBER & CRYPTO';

@@ -1,15 +1,15 @@
 /* Knowgura: dynamic three-title hero carousel + two editorial tags per film. */
 (() => {
  const fallback=[
-  {id:'UvzIOfuBZJA',title:'How America Keeps Donald Trump Alive',description:'A Knowgura documentary'},
-  {id:'EoSKI39989w',title:'SHAME! SHAME! SHAME! Binance',description:'A Knowgura documentary'},
-  {id:'c0FlK_MiQCE',title:"The World's Hardest Man to Kill - Kim Jong Un",description:'A Knowgura documentary'},
-  {id:'zu3cKL-vAVU',title:"Why It's (Almost) Impossible to Kill Benjamin Netanyahu",description:'A Knowgura documentary'},
-  {id:'-PRT_DBazIo',title:'The Cult That Poisoned a Town | Osho | Oregon',description:'A Knowgura documentary'},
-  {id:'amO4p6DMRYU',title:'Theranos: The $9 Billion Lie | Elizabeth Holmes',description:'A Knowgura documentary'},
-  {id:'coaAsEGHxzg',title:'D.B. Cooper: The $200,000 Mystery',description:'A Knowgura documentary'},
-  {id:'R4tJCOftFhY',title:'Does Quantum Physics Explain God?',description:'A Knowgura documentary'},
-  {id:'RSE9tTpjWFc',title:'The Company That Knows Almost Everything About You',description:'A Knowgura documentary'}
+  {id:"UvzIOfuBZJA",title:"How America Keeps Donald Trump Alive",description:"Inside the layered security system designed to keep the most powerful man in America alive."},
+  {id:"EoSKI39989w",title:"SHAME! SHAME! SHAME! Binance",description:"The crypto empire that shook the financial world—and the controversy behind its rise."},
+  {id:"c0FlK_MiQCE",title:"The World's Hardest Man to Kill - Kim Jong Un",description:"How North Korea’s most guarded leader stays protected from threats at every turn."},
+  {id:"zu3cKL-vAVU",title:"Why It's (Almost) Impossible to Kill Benjamin Netanyahu",description:"Inside the security network built around one of the world's most threatened leaders."},
+  {id:"-PRT_DBazIo",title:"The Cult That Poisoned a Town | Osho | Oregon",description:"How a spiritual commune in Oregon spiralled into one of America's most shocking scandals."},
+  {id:"amO4p6DMRYU",title:"Theranos: The $9 Billion Lie | Elizabeth Holmes | You Can See Everything",description:"How a billion-dollar blood-testing dream fooled investors—and what brought it crashing down."},
+  {id:"coaAsEGHxzg",title:"D.B. Cooper: The $200,000 Mystery",description:"He hijacked a plane, took $200,000, and vanished—leaving a mystery unsolved for decades."},
+  {id:"R4tJCOftFhY",title:"Does Quantum Physics Explains God?",description:"Where quantum physics meets the biggest question of all: could science explain God?"},
+  {id:"RSE9tTpjWFc",title:"The Company That Knows Almost Everything About You",description:"How a data giant can map your life from the digital clues you leave behind."}
  ];
  const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const classify=v=>{const s=(v.title+' '+(v.description||'')).toLowerCase();
@@ -37,11 +37,16 @@
  const card=v=>'<article class="card" data-search="'+esc((v.title+' '+(v.description||'')+' '+tags(v).join(' ')).toLowerCase())+'"><div class="thumb" data-video="'+esc(v.id)+'"><img loading="lazy" src="'+image(v.id)+'" alt="'+esc(v.title)+' thumbnail"><span class="play">▶</span></div><div class="video-tags">'+tagMarkup(v)+'</div><h3>'+esc(v.title)+'</h3></article>';
  async function load(){let videos=fallback;try{const r=await fetch('/videos.json?updated='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('catalogue');const d=await r.json();if(Array.isArray(d)&&d.length){const valid=d.filter(v=>v&&/^[A-Za-z0-9_-]{11}$/.test(v.id)&&v.title);if(valid.length)videos=valid}}catch(e){console.warn('Using saved Knowgura catalogue',e)}
   const featured=videos.slice(0,3);let active=0;const hero=document.getElementById('hero'),title=document.getElementById('heroTitle'),description=document.getElementById('heroDescription'),tagBox=document.getElementById('heroTags'),watch=document.getElementById('heroWatch'),dots=document.getElementById('heroDots');
-  const paint=()=>{const v=featured[active];if(!v)return;hero.style.backgroundImage="linear-gradient(90deg,#080808 0%,rgba(8,8,8,.86) 31%,rgba(8,8,8,.12) 82%),linear-gradient(0deg,#080808 0%,transparent 53%),url('https://i.ytimg.com/vi/"+encodeURIComponent(v.id)+"/maxresdefault.jpg')";title.textContent=v.title;description.textContent=(v.description&&v.description!=='A Knowgura documentary')?v.description:'A Knowgura original investigation. Watch the full documentary and discover the story behind the headlines.';tagBox.innerHTML=tagMarkup(v);watch.onclick=()=>window.openKnowguraVideo(v.id);[...dots.children].forEach((d,i)=>d.classList.toggle('active',i===active));};
+  const paint=()=>{const v=featured[active];if(!v)return;hero.style.backgroundImage="linear-gradient(90deg,#080808 0%,rgba(8,8,8,.86) 31%,rgba(8,8,8,.12) 82%),linear-gradient(0deg,#080808 0%,transparent 53%),url('https://i.ytimg.com/vi/"+encodeURIComponent(v.id)+"/maxresdefault.jpg')";title.textContent=v.title;description.textContent=v.description||'Discover the story behind the headlines.';tagBox.innerHTML=tagMarkup(v);watch.onclick=()=>window.openKnowguraVideo(v.id);[...dots.children].forEach((d,i)=>d.classList.toggle('active',i===active));};
   dots.innerHTML=featured.map((_,i)=>'<button class="hero-dot'+(i===0?' active':'')+'" aria-label="Show featured documentary '+(i+1)+'" data-slide="'+i+'"></button>').join('');
   dots.querySelectorAll('[data-slide]').forEach(d=>d.addEventListener('click',()=>{active=Number(d.dataset.slide);paint()}));
   const move=step=>{if(featured.length<2)return;active=(active+step+featured.length)%featured.length;paint()};
-  document.getElementById('heroNext')?.addEventListener('click',()=>move(1));document.getElementById('heroPrev')?.addEventListener('click',()=>move(-1));paint();
+  document.getElementById('heroNext')?.addEventListener('click',()=>move(1));document.getElementById('heroPrev')?.addEventListener('click',()=>move(-1));
+  // Mobile: swipe horizontally across the hero to change featured documentaries.
+  let touchStartX=0,touchStartY=0;
+  hero.addEventListener('touchstart',e=>{if(!e.touches||e.touches.length!==1)return;touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
+  hero.addEventListener('touchend',e=>{if(!e.changedTouches||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-touchStartX;const dy=e.changedTouches[0].clientY-touchStartY;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.25)move(dx<0?1:-1);},{passive:true});
+  paint();
   if(featured.length>1)setInterval(()=>move(1),8000);
   const groups=[['politicsGrid','Power & Politics'],['crimeGrid','Crime'],['techGrid','Tech & Money'],['mysteryGrid','Mysteries']];
   groups.forEach(([id,cat])=>{const el=document.getElementById(id);const rows=videos.filter(v=>classify(v)===cat);el.innerHTML=rows.length?rows.map(card).join(''):'<p class="category-empty">More stories coming soon.</p>'});

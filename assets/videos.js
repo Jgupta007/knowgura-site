@@ -15,7 +15,7 @@
  const classify=v=>{const s=(v.title+' '+(v.description||'')).toLowerCase();
   if(/cooper|quantum physics|explain(?:s)? god|god\\b/.test(s))return 'Mysteries';
   if(/trump|president|prime minister|politic|government|kim jong|netanyahu|modi|leader|election|war|india protects|america protects|white house|power/.test(s))return 'Power & Politics';
-  if(/crime|heist|hack|fraud|scam|murder|killer|poison|cult|robbery|theft|bank|cooper|investigation|criminal/.test(s))return 'Crime';
+  if(/osho|sex guru|cia|\\blsd\\b|mind control|human experiment|crime|heist|hack|fraud|scam|murder|killer|poison|cult|robbery|theft|bank|cooper|investigation|criminal/.test(s))return 'Crime';
   if(/tech|technology|quantum|ai\b|artificial intelligence|internet|data|cyber|crypto|bitcoin|binance|money|billion|company|business|econom|theranos|finance|startup|software/.test(s))return 'Tech & Money';
   if(/mystery|mysterious|unexplained|secret|unknown|unsolved|disappear|god|ancient|paranormal|strange/.test(s))return 'Mysteries';
   return 'Mysteries';
@@ -26,7 +26,7 @@
   else if(/heist|bank|robbery|theft/.test(s))sub='HEIST';
   else if(/fraud|scam|theranos/.test(s))sub='FRAUD';
   else if(/hack|cyber|binance|crypto|bitcoin/.test(s))sub='CYBER & CRYPTO';
-  else if(/murder|killer|poison|cult|crime|criminal/.test(s))sub='TRUE CRIME';
+  else if(/osho|sex guru|cia|\\blsd\\b|mind control|human experiment|murder|killer|poison|cult|crime|criminal/.test(s))sub='TRUE CRIME';
   else if(/quantum|ai\b|technology|tech|internet|data|company|software/.test(s))sub='TECHNOLOGY';
   else if(/money|billion|business|econom|finance|startup/.test(s))sub='BUSINESS & MONEY';
   else if(/mystery|mysterious|unexplained|secret|unknown|unsolved|disappear|god|ancient|paranormal|strange/.test(s))sub='MYSTERY';
